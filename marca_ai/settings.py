@@ -134,3 +134,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core'
 ]
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'  # Coloque o host do seu provedor de email
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'seu_email@example.com'
+EMAIL_HOST_PASSWORD = 'sua_senha'

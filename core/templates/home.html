@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MARCA AÍ!</title>
-  <link rel="stylesheet" href="{% static 'home.css' %}">
-  <link rel="shortcut icon" href="assets/images/T.png" />
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="shortcut icon" href="{% static 'assets/images/T.png' %}" />
   <!-- Carregamento assíncrono da API do Google Maps -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKCb3V1EvFceZILU-A8T4h9RQy0zBzYU&callback=initMap"></script>
   <script>
@@ -180,7 +180,7 @@
 <body>
   <div class="container">
     <div class="football-info">
-      <img class="logo" src="assets/img/Marca Aí! Logo.svg" alt="">
+      <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="">
       <div id="map" style="height: 800px; width: 100%;"></div> <!-- Div para o mapa -->
       <a href="partidas.html" class="voltar-btn">Ver Partidas Marcadas</a>
     </div>
