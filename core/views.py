@@ -75,16 +75,48 @@ def user_login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
+        print(f"Tentando login com: Email: {email} e Senha: {password}")  # Debug
         
-        # Autentica o usuário com e-mail e senha
-        user = authenticate(request, username=email, password=password)  # 'username' para o AuthenticationForm
+        user = authenticate(request, username=email, password=password)
         
         if user is not None:
-            # Se o usuário for autenticado, faz o login
             login(request, user)
-            return redirect('home')  # Redireciona para a página 'home' após login
+            return redirect('home')
         else:
-            # Se a autenticação falhar, exibe mensagem de erro
             messages.error(request, 'Email ou senha incorretos.')
     
     return render(request, 'login.html')
+
+
+def partidas(request):
+    return render(request, 'partidas.html')
+
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Ponto
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Ponto
+import json
+
+@csrf_exempt
+def salvar_ponto(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            nome = data.get('nome')
+            descricao = data.get('descricao')
+            lat = data.get('lat')
+            lng = data.get('lng')
+
+            ponto = Ponto.objects.create(nome=nome, descricao=descricao, lat=lat, lng=lng)
+            return JsonResponse({"message": "Ponto salvo com sucesso!"}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+def listar_pontos(request):
+    pontos = Ponto.objects.all().values('nome', 'descricao', 'lat', 'lng')
+    return JsonResponse(list(pontos), safe=False)
+

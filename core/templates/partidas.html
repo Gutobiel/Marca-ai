@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +14,7 @@
     <div id="partidas-list">
       <!-- Lista de partidas será preenchida aqui pelo JavaScript -->
     </div>
-    <a href="index.html" class="voltar-btn">Voltar ao Mapa</a>
+    <a href="{% url 'home' %}" class="voltar-btn">Voltar ao Mapa</a>
   </div>
 
   <script>

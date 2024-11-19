@@ -26,4 +26,6 @@ urlpatterns = [
     path('cadastro/', views.register, name='cadastro'),
     path('home/', views.home, name='home'), 
     path('partidas/', views.partidas, name='partidas'), 
+    path('salvar_ponto/', views.salvar_ponto, name='salvar_ponto'),
+    path('listar_pontos/', views.listar_pontos, name='listar_pontos'),
 ]
