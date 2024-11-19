@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,24 +16,43 @@
     <div class="container">
       <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="">
       <h2 class="newaccount">New account</h2>
-      <form action="{% url 'register' %}" method="post" id="form">
+
+      <!-- Exibindo mensagens de erro ou sucesso -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Formulário de cadastro -->
+      <form action="{% url 'cadastro' %}" method="post" id="form">
         {% csrf_token %}
-        {{ form.as_p }}  <!-- Exibe o formulário do Django com campos de nome, email e senha -->
-        <button type="submit" class="signup">Sign up</button> <!-- Redireciona para home.html após criação da conta -->
+        <input class="input" type="text" name="username" placeholder="Username" required>
+        <input class="input" type="email" name="email" placeholder="name@gmail.com" required>
+        <input class="input" type="password" name="password1" placeholder="Password" required>
+        <input class="input" type="password" name="password2" placeholder="Confirm Password" required>
+        <button type="submit" class="signup">Sign up</button>
       </form>
+      
       <div class="same-line signin">
         <p>Already have an account?<a class="signinlink" href="{% url 'login' %}"> Sign in</a></p>
       </div>
+
       <div class="line"></div>
-      <div class="same-line loginwith google"><img src="{% static 'assets/img/icons8-google-logo 1.svg' %}" alt="">
+      <div class="same-line loginwith google">
+        <img src="{% static 'assets/img/icons8-google-logo 1.svg' %}" alt="">
         <p class="continue">Continue with Google</p>
       </div>
-      <div class="same-line loginwith facebook"><img src="{% static 'assets/img/icons8-facebook-novo 1.svg' %}" alt="">
+      <div class="same-line loginwith facebook">
+        <img src="{% static 'assets/img/icons8-facebook-novo 1.svg' %}" alt="">
         <p class="continue">Continue with Facebook</p>
       </div>
     </div>
   </div>
   <div class="block2"></div>
+
 </body>
 
 </html>

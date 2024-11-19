@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -120,6 +121,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -135,10 +137,21 @@ INSTALLED_APPS = [
     'core'
 ]
 
-# settings.py
+
+# Configuração para o Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.example.com'  # Coloque o host do seu provedor de email
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'seu_email@example.com'
-EMAIL_HOST_PASSWORD = 'sua_senha'
+EMAIL_HOST_USER = 'ainnguttoo@gmail.com'
+EMAIL_HOST_PASSWORD = 'Biel.122'
+
+
+
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.SUCCESS: 'success',
+}
+
