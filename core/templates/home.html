@@ -5,30 +5,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MARCA AÍ!</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="shortcut icon" href="{% static 'assets/images/T.png' %}" />
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKCb3V1EvFceZILU-A8T4h9RQy0zBzYU&callback=initMap"></script>
+  <script>
+    let map;
+    let markers = [];
+    let pontos = JSON.parse(localStorage.getItem('pontosMarcados')) || [];
+
+    function initMap() {
+      const localizacaoInicial = { lat: -15.7801, lng: -47.9292 }; // Brasília
+
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: localizacaoInicial,
+        zoom: 14,
+        disableDefaultUI: true,
+      });
+
+      carregarPontos(map);
+
+      map.addListener('click', (e) => {
+        addMarker(e.latLng, map);
+      });
+    }
+
+    function addMarker(location, map) {
+      const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        title: 'Clique para salvar informações do ponto',
+      });
+
+      marker.addListener('click', () => {
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div>
+              <h3>Salvar Informações do Ponto</h3>
+              <p><strong>Localização:</strong> ${location.lat()}, ${location.lng()}</p>
+              <label for="descricao">Descrição:</label>
+              <input type="text" id="descricao" placeholder="Ex.: Quadra poliesportiva">
+              <label for="esporte">Esporte:</label>
+              <input type="text" id="esporte" placeholder="Ex.: Futebol">
+              <button onclick="salvarPonto(${location.lat()}, ${location.lng()})">Salvar</button>
+            </div>
+          `,
+        });
+
+        infoWindow.open(map, marker);
+      });
+
+      markers.push(marker);
+    }
+
+    function salvarPonto(lat, lng) {
+      const descricao = document.getElementById('descricao').value;
+      const esporte = document.getElementById('esporte').value;
+
+      const ponto = {
+        lat: lat,
+        lng: lng,
+        descricao: descricao,
+        esporte: esporte,
+      };
+
+      pontos.push(ponto);
+
+      localStorage.setItem('pontosMarcados', JSON.stringify(pontos));
+
+      alert('Informações do ponto salvas com sucesso!');
+    }
+
+    function carregarPontos(map) {
+      pontos.forEach(ponto => {
+        const marker = new google.maps.Marker({
+          position: { lat: ponto.lat, lng: ponto.lng },
+          map: map,
+          title: `${ponto.descricao} (${ponto.esporte})`,
+          icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        });
+
+        marker.addListener('mouseover', () => {
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div>
+                <h3>${ponto.descricao}</h3>
+                <p>Esporte: ${ponto.esporte}</p>
+              </div>
+            `,
+          });
+
+          infoWindow.open(map, marker);
+        });
+
+        markers.push(marker);
+      });
+    }
+  </script>
 </head>
 <body>
-<div class="container">
-  <div class="football-info">
-    <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Marca Aí! Logo">
-    
-    <!-- Div do mapa, com a altura definida para 800px -->
-    <div id="map" style="height: 800px; width: 100%;"></div>
-
-    <!-- Link para a página de partidas marcadas -->
-    <a href="{% url 'partidas' %}" class="voltar-btn">Ver Partidas Marcadas</a>
+  <div class="container">
+    <div class="football-info">
+      <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Marca Aí! Logo">
+      <div id="map" style="height: 800px; width: 100%;"></div>
+      <a href="{% url 'partidas' %}" class="voltar-btn">Ver Partidas Criadas</a>
+    </div>
   </div>
-</div>
-
-<!-- Adicionando o Leaflet.js ao final do body -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{% static 'js/home.js' %}"></script>
-<script type="text/javascript">
-  const listarPontosUrl = "{% url 'listar_pontos' %}";
-</script>
-<script src="{% static 'assets/js/home.js' %}"></script>
-
 </body>
 </html>

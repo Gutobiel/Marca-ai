@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partidas de {{ quadra.descricao }}</title>
+  <link rel="stylesheet" href="{% static 'css/partidas.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h2>Partidas de {{ quadra.descricao }}</h2>
+    <div id="partidas-list">
+      {% if partidas %}
+        {% for partida in partidas %}
+          <div class="partida-item">
+            <p><strong>Esporte:</strong> {{ partida.esporte }}</p>
+            <p><strong>Data:</strong> {{ partida.data }}</p>
+            <p><strong>Horário:</strong> {{ partida.horario }}</p>
+            <p><strong>Máximo de Participantes:</strong> {{ partida.max_participantes }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>Não há partidas agendadas para esta quadra.</p>
+      {% endif %}
+    </div>
+    <a href="{% url 'listar_quadras' %}" class="voltar-btn">Voltar às Quadras</a>
+  </div>
+</body>
+</html>

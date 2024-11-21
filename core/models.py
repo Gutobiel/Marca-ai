@@ -1,13 +1,13 @@
 from django.db import models
 
-
 class Ponto(models.Model):
-    nome = models.CharField(max_length=100)
-    descricao = models.TextField()
-    lat = models.FloatField()
-    lng = models.FloatField()
+    descricao = models.CharField(max_length=255)
+    categoria = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
     def __str__(self):
-        return self.nome
+        return f"{self.descricao} ({self.categoria})"
+
 
 

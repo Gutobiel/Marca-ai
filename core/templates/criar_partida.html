@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Partida</title>
+  <link rel="stylesheet" href="{% static 'css/partidas.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h2>Criar Partida na Quadra: {{ quadra.descricao }}</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn">Salvar Partida</button>
+    </form>
+    <a href="{% url 'partidas_da_quadra' quadra.id %}" class="voltar-btn">Voltar para as Partidas</a>
+  </div>
+</body>
+</html>

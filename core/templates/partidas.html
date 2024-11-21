@@ -4,46 +4,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Partidas Criadas</title>
+  <title>Quadras Existentes</title>
   <link rel="stylesheet" href="{% static 'css/partidas.css' %}">
   <link rel="shortcut icon" href="{% static 'assets/images/T.png' %}" />
 </head>
 <body>
   <div class="container">
-    <h2>Partidas Criadas</h2>
-    <div id="partidas-list">
-      <!-- Lista de partidas será preenchida aqui pelo JavaScript -->
-    </div>
-    <a href="{% url 'home' %}" class="voltar-btn">Voltar ao Mapa</a>
+    <h2>Quadras Existentes</h2>
+  <div id="quadras-list">
+    {% for quadra in quadras %}
+      <div class="quadra-item">
+        <h3>{{ quadra.descricao }}</h3>
+        <p><strong>Categoria:</strong> {{ quadra.categoria }}</p>
+        <p><strong>Localização:</strong> {{ quadra.latitude }}, {{ quadra.longitude }}</p>
+        <a href="{% url 'criar_partida' quadra.id %}">Criar Partida</a>
+      </div>
+    {% endfor %}
+  </div>
+  <a href="{% url 'home' %}" class="voltar-btn">Voltar ao Mapa</a>
   </div>
 
   <script>
-    // Função para carregar partidas
-    function carregarPartidas() {
-      const partidas = JSON.parse(localStorage.getItem('partidasEsporte')) || [];
-      const partidasList = document.getElementById('partidas-list');
-      partidasList.innerHTML = '';
+    function carregarQuadras() {
+      const pontos = JSON.parse(localStorage.getItem('pontosMarcados')) || [];
+      const quadrasList = document.getElementById('quadras-list');
+      quadrasList.innerHTML = '';
 
-      if (partidas.length === 0) {
-        partidasList.innerHTML = '<p>Não há partidas criadas.</p>';
+      if (pontos.length === 0) {
+        quadrasList.innerHTML = '<p>Não há quadras marcadas no momento.</p>';
         return;
       }
 
-      partidas.forEach(partida => {
-        const partidaItem = document.createElement('div');
-        partidaItem.className = 'partida-item';
-        partidaItem.innerHTML = `
-          <h3>${partida.esporte}</h3>
-          <p><strong>Hora:</strong> ${partida.hora}</p>
-          <p><strong>Localização:</strong> ${partida.lat}, ${partida.lng}</p>
-          <p><strong>Participantes:</strong> 0</p> <!-- Atualize conforme necessário -->
+      pontos.forEach((ponto, index) => {
+        const quadraItem = document.createElement('div');
+        quadraItem.className = 'quadra-item';
+        quadraItem.innerHTML = `
+          <h3>${ponto.descricao || 'Quadra Sem Nome'}</h3>
+          <p><strong>Categoria:</strong> ${ponto.categoria}</p>
+          <p><strong>Localização:</strong> ${ponto.lat}, ${ponto.lng}</p>
+          <button onclick="mostrarFormulario(${index})">Criar Partida</button>
+          <div id="formulario-partida-${index}" class="formulario-partida" style="display: none;">
+            <h4>Criar Partida</h4>
+            <label for="esporte-${index}">Esporte:</label>
+            <select id="esporte-${index}">
+              <option value="Basquete">Basquete</option>
+              <option value="Futebol">Futebol</option>
+              <option value="Vôlei">Vôlei</option>
+              <option value="Outros">Outros</option>
+            </select>
+            <label for="data-${index}">Data:</label>
+            <input type="date" id="data-${index}">
+            <label for="horario-${index}">Horário:</label>
+            <input type="time" id="horario-${index}">
+            <label for="max-participantes-${index}">Máximo de Participantes:</label>
+            <input type="number" id="max-participantes-${index}" min="1">
+            <button onclick="salvarPartida(${index})">Salvar</button>
+          </div>
         `;
-        partidasList.appendChild(partidaItem);
+        quadrasList.appendChild(quadraItem);
       });
     }
 
-    // Carregar partidas quando a página for carregada
-    window.onload = carregarPartidas;
+    function mostrarFormulario(index) {
+      const formulario = document.getElementById(`formulario-partida-${index}`);
+      formulario.style.display = formulario.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function salvarPartida(index) {
+      const esporte = document.getElementById(`esporte-${index}`).value;
+      const data = document.getElementById(`data-${index}`).value;
+      const horario = document.getElementById(`horario-${index}`).value;
+      const maxParticipantes = document.getElementById(`max-participantes-${index}`).value;
+
+      if (!data || !horario || !maxParticipantes) {
+        alert('Por favor, preencha todos os campos do formulário.');
+        return;
+      }
+
+      const pontos = JSON.parse(localStorage.getItem('pontosMarcados')) || [];
+      const quadra = pontos[index];
+
+      const partidas = JSON.parse(localStorage.getItem('partidasEsporte')) || [];
+      partidas.push({
+        esporte,
+        data,
+        horario,
+        maxParticipantes,
+        descricao: quadra.descricao,
+        categoria: quadra.categoria,
+        lat: quadra.lat,
+        lng: quadra.lng,
+      });
+
+      localStorage.setItem('partidasEsporte', JSON.stringify(partidas));
+      alert('Partida salva com sucesso!');
+    }
+
+    // Carregar quadras ao carregar a página
+    window.onload = carregarQuadras;
   </script>
 </body>
 </html>

@@ -4,9 +4,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from streamlit import form
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Ponto
+from django.contrib.auth import login
+from django.core.mail import send_mail
+from django.conf import settings
+from .forms import UserRegistrationForm
 
 def login(request):
     return render(request, 'login.html')
@@ -23,19 +28,6 @@ def partidas(request):
 
 """ CADASTRO """
 # core/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.core.mail import send_mail
-from django.conf import settings
-from .forms import UserRegistrationForm
-from django.contrib import messages
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib.auth import login
-from .forms import UserRegistrationForm
 
 def register(request):
     if request.method == 'POST':
@@ -92,31 +84,31 @@ def partidas(request):
     return render(request, 'partidas.html')
 
 
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Ponto
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Ponto
-import json
-
 @csrf_exempt
 def salvar_ponto(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            nome = data.get('nome')
-            descricao = data.get('descricao')
-            lat = data.get('lat')
-            lng = data.get('lng')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        descricao = data.get('descricao')
+        categoria = data.get('categoria')
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
 
-            ponto = Ponto.objects.create(nome=nome, descricao=descricao, lat=lat, lng=lng)
-            return JsonResponse({"message": "Ponto salvo com sucesso!"}, status=200)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+        if descricao and categoria and latitude and longitude:
+            Ponto.objects.create(
+                descricao=descricao,
+                categoria=categoria,
+                latitude=latitude,
+                longitude=longitude
+            )
+            return JsonResponse({'success': True})
+        return JsonResponse({'success': False, 'error': 'Dados inválidos'})
+    return JsonResponse({'success': False, 'error': 'Método não permitido'})
 
 def listar_pontos(request):
-    pontos = Ponto.objects.all().values('nome', 'descricao', 'lat', 'lng')
-    return JsonResponse(list(pontos), safe=False)
+    pontos = Ponto.objects.all()
+    return render(request, 'listar_pontos.html', {'pontos': pontos})
+
+def mapa_e_lista(request):
+    pontos = Ponto.objects.all()
+    return render(request, 'mapa_lista.html', {'pontos': pontos})
 
