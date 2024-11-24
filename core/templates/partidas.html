@@ -11,17 +11,10 @@
 <body>
   <div class="container">
     <h2>Quadras Existentes</h2>
-  <div id="quadras-list">
-    {% for quadra in quadras %}
-      <div class="quadra-item">
-        <h3>{{ quadra.descricao }}</h3>
-        <p><strong>Categoria:</strong> {{ quadra.categoria }}</p>
-        <p><strong>Localização:</strong> {{ quadra.latitude }}, {{ quadra.longitude }}</p>
-        <a href="{% url 'criar_partida' quadra.id %}">Criar Partida</a>
-      </div>
-    {% endfor %}
-  </div>
-  <a href="{% url 'home' %}" class="voltar-btn">Voltar ao Mapa</a>
+    <div id="quadras-list">
+      <!-- Lista de quadras será preenchida aqui pelo JavaScript -->
+    </div>
+    <a href="{% url 'home' %}" class="voltar-btn">Voltar ao Mapa</a>
   </div>
 
   <script>
@@ -40,7 +33,7 @@
         quadraItem.className = 'quadra-item';
         quadraItem.innerHTML = `
           <h3>${ponto.descricao || 'Quadra Sem Nome'}</h3>
-          <p><strong>Categoria:</strong> ${ponto.categoria}</p>
+          <p><strong>Categoria:</strong> ${ponto.esporte}</p>
           <p><strong>Localização:</strong> ${ponto.lat}, ${ponto.lng}</p>
           <button onclick="mostrarFormulario(${index})">Criar Partida</button>
           <div id="formulario-partida-${index}" class="formulario-partida" style="display: none;">

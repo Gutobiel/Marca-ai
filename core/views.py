@@ -12,8 +12,11 @@ from django.contrib.auth import login
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import UserRegistrationForm
+from django.contrib.auth.models import User
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.backends import ModelBackend
 
-def login(request):
+def user_login_view(request):
     return render(request, 'login.html')
 
 def home(request):
@@ -49,19 +52,15 @@ def register(request):
             # Mensagem de sucesso
             messages.success(request, 'Conta criada com sucesso! Você já pode fazer login.')
 
-            # Faz login do usuário e redireciona para a página inicial
-            login(request, user)
-            return redirect('home')  # Redireciona para a página de home (ajuste conforme necessário)
-
+            # Realiza o login do usuário e redireciona para a página inicial
+            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Corrigido aqui
+            return redirect('home')  # Redireciona para a página de home
         else:
-            # Se o formulário não for válido, exibe as mensagens de erro
             messages.error(request, 'Erro no cadastro. Verifique os campos e tente novamente.')
     else:
         form = UserRegistrationForm()
 
     return render(request, 'cadastro.html', {'form': form})
-
-
 
 def user_login(request):
     if request.method == 'POST':
@@ -69,9 +68,13 @@ def user_login(request):
         password = request.POST['password']
         print(f"Tentando login com: Email: {email} e Senha: {password}")  # Debug
         
-        user = authenticate(request, username=email, password=password)
-        
-        if user is not None:
+        # Busca o usuário pelo email
+        try:
+            user = User.objects.get(email=email)  # Aqui você pega o usuário pelo e-mail
+        except User.DoesNotExist:
+            user = None
+
+        if user is not None and user.check_password(password):  # Verifica se a senha está correta
             login(request, user)
             return redirect('home')
         else:
