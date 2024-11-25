@@ -1,3 +1,4 @@
+from cProfile import Profile
 from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -15,6 +16,7 @@ from .forms import UserRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.backends import ModelBackend
+from .models import PasswordResetToken
 
 def user_login_view(request):
     return render(request, 'login.html')
@@ -67,24 +69,21 @@ def user_login(request):
         email = request.POST['email']
         password = request.POST['password']
         print(f"Tentando login com: Email: {email} e Senha: {password}")  # Debug
-        
-        # Busca o usuário pelo email
-        try:
-            user = User.objects.get(email=email)  # Aqui você pega o usuário pelo e-mail
-        except User.DoesNotExist:
-            user = None
 
-        if user is not None and user.check_password(password):  # Verifica se a senha está correta
-            login(request, user)
+        # Autentica o usuário com base no e-mail e senha
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            # Garante que o perfil do usuário exista
+            if not hasattr(user, 'profile'):
+                Profile.objects.create(user=user)
+
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Login com backend explícito
             return redirect('home')
         else:
             messages.error(request, 'Email ou senha incorretos.')
     
     return render(request, 'login.html')
-
-
-def partidas(request):
-    return render(request, 'partidas.html')
 
 
 @csrf_exempt
@@ -114,4 +113,57 @@ def listar_pontos(request):
 def mapa_e_lista(request):
     pontos = Ponto.objects.all()
     return render(request, 'mapa_lista.html', {'pontos': pontos})
+
+from django.contrib.auth.hashers import make_password
+
+import random
+
+def enviar_codigo(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            usuario = User.objects.get(email=email)
+            codigo = random.randint(100000, 999999)  # Gera um código de 6 dígitos
+            usuario.profile.codigo_recuperacao = codigo  # Supondo que o modelo Profile tenha esse campo
+            usuario.profile.save()
+
+            send_mail(
+                'Código de Redefinição de Senha',
+                f'Seu código para redefinir a senha é: {codigo}',
+                'seu_email@exemplo.com',  # Substitua pelo seu e-mail de envio
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, 'Código enviado para o seu e-mail.')
+            return redirect('confirmar_codigo')
+        except User.DoesNotExist:
+            messages.error(request, 'E-mail não encontrado.')
+    return render(request, 'enviar_codigo.html')
+
+def confirmar_codigo(request):
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        try:
+            profile = request.user.profile  # Ajuste conforme sua relação com User
+            if str(profile.codigo_recuperacao) == token:
+                profile.codigo_recuperacao = None  # Apaga o código após uso
+                profile.save()
+                return redirect('redefinir_senha')
+            else:
+                messages.error(request, 'Código inválido.')
+        except AttributeError:
+            messages.error(request, 'Erro interno, tente novamente.')
+    return render(request, 'confirmar_codigo.html')
+
+def redefinir_senha(request):
+    if request.method == 'POST':
+        nova_senha = request.POST.get('password')
+        user = request.user
+        user.password = make_password(nova_senha)
+        user.save()
+        messages.success(request, 'Senha redefinida com sucesso.')
+        return redirect('login')
+    return render(request, 'redefinir_senha.html')
+
+
 

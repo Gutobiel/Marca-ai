@@ -19,6 +19,9 @@ from core import views
 from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
+from django.contrib.auth import views as auth_views
+
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,4 +32,7 @@ urlpatterns = [
     path('salvar-ponto/', views.salvar_ponto, name='salvar_ponto'),
     path('listar-pontos/', views.listar_pontos, name='listar_pontos'),
     path('mapa-e-lista/', views.mapa_e_lista, name='mapa_e_lista'),
+    path('enviar-codigo/', views.enviar_codigo, name='enviar-codigo'),
+    path('confirmar-codigo/', views.confirmar_codigo, name='confirmar_codigo'),
+    path('redefinir-senha/', views.redefinir_senha, name='redefinir_senha'),
 ]
