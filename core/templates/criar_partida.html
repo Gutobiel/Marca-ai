@@ -15,7 +15,7 @@
       {{ form.as_p }}
       <button type="submit" class="btn">Salvar Partida</button>
     </form>
-    <a href="{% url 'partidas_da_quadra' quadra.id %}" class="voltar-btn">Voltar para as Partidas</a>
+    {% comment %} <a href="{% url 'partidas_da_quadra' quadra.id %}" class="voltar-btn">Voltar para as Partidas</a> {% endcomment %}
   </div>
 </body>
 </html>

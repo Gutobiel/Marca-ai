@@ -35,4 +35,6 @@ urlpatterns = [
     path('enviar-codigo/', views.enviar_codigo, name='enviar-codigo'),
     path('confirmar-codigo/', views.confirmar_codigo, name='confirmar_codigo'),
     path('redefinir-senha/', views.redefinir_senha, name='redefinir_senha'),
+    path('partidas-criadas/', views.ver_partidas_criadas, name='ver_partidas_criadas'),
+    path('criar-partida/', views.criar_partida, name='criar_partida'),
 ]

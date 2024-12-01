@@ -9,11 +9,12 @@
 </head>
 <body>
   <div class="container">
-    <h2>Partidas de {{ quadra.descricao }}</h2>
+    <h2>Partidas Existentes {{ quadra.descricao }}</h2>
     <div id="partidas-list">
       {% if partidas %}
         {% for partida in partidas %}
           <div class="partida-item">
+            <strong><h2>Criador: {{ partida.criador.username }}</h2></strong>
             <p><strong>Esporte:</strong> {{ partida.esporte }}</p>
             <p><strong>Data:</strong> {{ partida.data }}</p>
             <p><strong>Horário:</strong> {{ partida.horario }}</p>
@@ -24,7 +25,7 @@
         <p>Não há partidas agendadas para esta quadra.</p>
       {% endif %}
     </div>
-    <a href="{% url 'listar_quadras' %}" class="voltar-btn">Voltar às Quadras</a>
+    <a href="{% url 'partidas' %}" class="voltar-btn">Voltar às Quadras</a>
   </div>
 </body>
 </html>

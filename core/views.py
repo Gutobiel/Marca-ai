@@ -17,6 +17,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.backends import ModelBackend
 from .models import PasswordResetToken
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import PartidaForm
 
 def user_login_view(request):
     return render(request, 'login.html')
@@ -29,6 +32,12 @@ def cadastro(request):
 
 def partidas(request):
     return render(request, 'partidas.html')
+
+def ver_partidas_criadas(request):
+    return render(request, 'partidas_da_quadra.html')
+
+def criar_partida(request):
+    return render(request, 'criar-partida.html')
 
 
 """ CADASTRO """
@@ -164,6 +173,25 @@ def redefinir_senha(request):
         messages.success(request, 'Senha redefinida com sucesso.')
         return redirect('login')
     return render(request, 'redefinir_senha.html')
+
+
+
+@login_required
+def criar_partida(request):
+    if request.method == 'POST':
+        form = PartidaForm(request.POST)
+        if form.is_valid():
+            partida = form.save(commit=False)
+            partida.criador = request.user
+            partida.save()
+            messages.success(request, 'Partida criada com sucesso!')
+            return redirect('partidas')  # Substitua pelo nome da URL da página
+        else:
+            messages.error(request, 'Erro ao criar partida. Verifique os dados.')
+    else:
+        form = PartidaForm()
+
+    return render(request, 'partidas.html', {'form': form})
 
 
 

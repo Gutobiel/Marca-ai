@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 import uuid
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Ponto(models.Model):
     descricao = models.CharField(max_length=255)
@@ -32,13 +34,21 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class Partida(models.Model):
+    esporte = models.CharField(max_length=100)
+    data = models.DateField()
+    horario = models.TimeField()
+    max_participantes = models.PositiveIntegerField()
+    descricao = models.CharField(max_length=255)
+    categoria = models.CharField(max_length=100)
+    lat = models.FloatField()
+    lng = models.FloatField()
+    criador = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.esporte} - {self.descricao}"
     
-    
-    
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth.models import User
-from .models import Profile
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
