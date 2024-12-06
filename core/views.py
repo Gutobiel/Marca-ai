@@ -94,26 +94,41 @@ def user_login(request):
     
     return render(request, 'login.html')
 
-
 @csrf_exempt
 def salvar_ponto(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        descricao = data.get('descricao')
-        categoria = data.get('categoria')
-        latitude = data.get('latitude')
-        longitude = data.get('longitude')
-
-        if descricao and categoria and latitude and longitude:
-            Ponto.objects.create(
-                descricao=descricao,
-                categoria=categoria,
-                latitude=latitude,
-                longitude=longitude
+        try:
+            data = json.loads(request.body)  # Analisa o corpo da requisição JSON
+            quadra = Quadra.objects.create(
+                descricao=data['descricao'],
+                latitude=data['lat'],
+                longitude=data['lng']
             )
-            return JsonResponse({'success': True})
-        return JsonResponse({'success': False, 'error': 'Dados inválidos'})
-    return JsonResponse({'success': False, 'error': 'Método não permitido'})
+            return JsonResponse({'message': 'Ponto salvo com sucesso!', 'id': quadra.id}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Quadra  # Certifique-se de que o modelo correto está sendo usado
+
+@csrf_exempt
+def salvar_quadra(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Analisa o corpo da requisição JSON
+            quadra = Quadra.objects.create(
+                descricao=data['descricao'],
+                latitude=data['latitude'],
+                longitude=data['longitude']
+            )
+            return JsonResponse({'message': 'Quadra salva com sucesso!', 'id': quadra.id}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+
 
 def listar_pontos(request):
     pontos = Ponto.objects.all()
@@ -193,5 +208,12 @@ def criar_partida(request):
 
     return render(request, 'partidas.html', {'form': form})
 
+from django.shortcuts import render, get_object_or_404
+from .models import Quadra, Partida
+
+def partidas_por_quadra(request, quadra_id):
+    quadra = get_object_or_404(Quadra, id=quadra_id)
+    partidas = quadra.partidas.all()  # Usa o `related_name` definido no modelo
+    return render(request, 'partidas_por_quadra.html', {'quadra': quadra, 'partidas': partidas})
 
 

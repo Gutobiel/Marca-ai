@@ -14,6 +14,15 @@ class Ponto(models.Model):
     def __str__(self):
         return f"{self.descricao} ({self.categoria})"
 
+        
+class Quadra(models.Model):
+    descricao = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def __str__(self):
+        return self.descricao
+
 
 
 class PasswordResetToken(models.Model):
