@@ -194,4 +194,26 @@ def criar_partida(request):
     return render(request, 'partidas.html', {'form': form})
 
 
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Ponto
 
+@csrf_exempt
+def salvar_quadra(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            pontos = data.get('pontos', [])
+            for ponto in pontos:
+                Ponto.objects.create(
+                    descricao=ponto.get('descricao', 'Sem descrição'),
+                    esporte=ponto.get('esporte', 'Desconhecido'),
+                    lat=ponto.get('lat'),
+                    lng=ponto.get('lng'),
+                )
+            return JsonResponse({'success': True, 'message': 'Quadras salvas com sucesso!'}, status=201)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    return JsonResponse({'success': False, 'error': 'Método não permitido'}, status=405)

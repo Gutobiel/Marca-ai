@@ -37,4 +37,5 @@ urlpatterns = [
     path('redefinir-senha/', views.redefinir_senha, name='redefinir_senha'),
     path('partidas-criadas/', views.ver_partidas_criadas, name='ver_partidas_criadas'),
     path('criar-partida/', views.criar_partida, name='criar_partida'),
+    path('salvar-quadra/', views.salvar_quadra, name='salvar_quadra'),
 ]

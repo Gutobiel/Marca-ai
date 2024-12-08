@@ -107,8 +107,9 @@
     <div class="football-info">
       <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Marca Aí! Logo">
       <div id="map" style="height: 800px; width: 100%;"></div>
-      <a href="{% url 'partidas' %}" class="voltar-btn">Ver Quadras</a>
+      <a href="{% url 'partidas' %}" class="voltar-btn" onclick="salvarQuadras()">Ver Quadras</a>
     </div>
   </div>
 </body>
+<script src="{% static 'js/salvarQuadras.js' %}"></script>
 </html>
