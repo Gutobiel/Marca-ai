@@ -58,22 +58,49 @@
     }
 
     function salvarPonto(lat, lng) {
-      const descricao = document.getElementById('descricao').value;
-      const esporte = document.getElementById('esporte').value;
+  const descricao = document.getElementById('descricao').value;
+  const esporte = document.getElementById('esporte').value;
 
-      const ponto = {
-        lat: lat,
-        lng: lng,
-        descricao: descricao,
-        esporte: esporte,
-      };
+  if (!descricao || !esporte) {
+    alert('Por favor, preencha todos os campos antes de salvar.');
+    return;
+  }
 
-      pontos.push(ponto);
+  const ponto = {
+    lat: lat,
+    lng: lng,
+    descricao: descricao,
+    esporte: esporte,
+  };
 
-      localStorage.setItem('pontosMarcados', JSON.stringify(pontos));
+  // Salvar no LocalStorage
+  pontos.push(ponto);
+  localStorage.setItem('pontosMarcados', JSON.stringify(pontos));
 
-      alert('Informações do ponto salvas com sucesso!');
-    }
+  // Salvar no banco via API
+  fetch('/api/salvar_quadra/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(ponto),
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Erro ao salvar a quadra no servidor.');
+      }
+    })
+    .then(data => {
+      alert('Quadra salva com sucesso no banco de dados!');
+      console.log('Resposta do servidor:', data);
+    })
+    .catch(error => {
+      console.error('Erro ao salvar quadra:', error);
+      alert('Erro ao salvar a quadra no banco de dados.');
+    });
+}
 
     function carregarPontos(map) {
       pontos.forEach(ponto => {
