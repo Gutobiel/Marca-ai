@@ -1,101 +1,18 @@
+{% extends 'base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Partidas de {{ quadra.descricao }}</title>
+  
   <link rel="stylesheet" href="{% static 'css/partidas.css' %}">
+  {% block content %}
   <link rel="shortcut icon" href="{% static 'assets/img/Marca Aí! Short.svg' %}" />
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    #side-bar {
-        width: 200px; 
-        height: 100%;
-        background: linear-gradient(to bottom, #FF4500, #FFA500); 
-        position: fixed;
-        top: 0;
-        left: 0; 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 20px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); 
-    }
 
-    #side-bar ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-    }
-
-    #side-bar ul li {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-
-    #side-bar ul li a {
-        color: #ffffff;
-        text-decoration: none;
-        display: block;
-        padding: 10px 15px;
-        transition: background-color 0.3s;
-        width: 100%; 
-        text-align: left; 
-        border-radius: 5px; 
-    }
-
-    #side-bar ul li a:hover {
-        background-color: #FFA500; 
-    }
-
-    .logout-item {
-        margin-top: auto; 
-        width: 100%;
-    }
-
-    .logout-icon {
-        background: none;
-        border: none;
-        color: #ffffff;
-        font-size: 1.2em;
-        padding: 10px 15px;
-        text-align: left;
-        cursor: pointer;
-        width: 115%;
-        transition: background-color 0.3s;
-        border-radius: 5px; 
-    }
-
-    .logout-icon:hover {
-        background-color: #FFA500; 
-    }
-
-    .logo {
-        max-width: 200px;
-        display: block;
-        margin: 0 auto 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
+
 <body>
-  <nav id="side-bar">
-    <ul>
-        <li><a href="{% url 'home' %}">Home/Mapa</a></li>
-        <li><a href="{% url 'listar_quadras' %}">Quadras</a></li>
-        <li><a href="{% url 'perfil' %}">Perfil</a></li>
-        <li class="logout-item">
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="logout-icon">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </button>
-            </form>
-        </li>
-    </ul>
-  </nav>
 
   <div class="container">
     <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Marca Aí! Logo">
@@ -144,3 +61,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+{% endblock %}
