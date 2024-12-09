@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarcaAi! Login</title>
+  <link rel="shortcut icon" href="{% static 'assets/images/T.png' %}" />
+  <link rel="stylesheet" href="{% static 'css/styleslogin.css' %}">
+  <link rel="shortcut icon" href="{% static 'assets/img/Marca Aí! Short.svg' %}" />
+</head>
+
+<body>
+  <div class="block1"></div>
+  <div class="block2">
+    <div class="container">
+      <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Logo">
+      <h2 class="welcome">Bem-vindo!</h2>
+
+      <!-- Exibindo mensagens de erro -->
+      {% if messages %}
+        <div class="error-messages">
+          {% for message in messages %}
+            <p class="error">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Formulário de login -->
+      <form action="{% url 'login' %}" method="post" id="form">
+        {% csrf_token %}
+        
+        <!-- Campo de E-mail -->
+        <input class="input" type="email" name="email" placeholder="name@gmail.com" required value="{{ form.email.value }}">
+        
+        <!-- Campo de Senha -->
+        <input class="input" type="password" name="password" placeholder="Password" required>
+
+        <!-- Exibição de erros de login -->
+        {% if form.errors %}
+          <div class="error-messages">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <p class="error">{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Botão de login -->
+        <button form="form" type="submit" class="signin">Sign in</button>
+      </form>
+
+      <div class="same-line signup">
+        <p>Não possui uma conta? <a class="signuplink" href="{% url 'cadastro' %}">Resgistre-se</a></p>
+      </div>
+      <div class="line"></div>
+      <div class="forgot-password">
+        <p><a class="forgotlink" href="{% url 'enviar-codigo' %}">Esqueceu a senha?</a></p>
+      </div>  
+
+      <div class="line"></div>
+
+      <div class="same-line loginwith google">
+        <img src="{% static 'assets/img/icons8-google-logo 1.svg' %}" alt="Google logo">
+        <p class="continue">Continue com Google</p>
+      </div>
+
+      <div class="same-line loginwith facebook">
+        <img src="{% static 'assets/img/icons8-facebook-novo 1.svg' %}" alt="Facebook logo">
+        <p class="continue">Continue com Facebook</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

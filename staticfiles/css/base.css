@@ -1,0 +1,62 @@
+#side-bar {
+    width: 200px; /* Define uma largura fixa para a barra lateral */
+    height: 100%;
+    background-color: #151d3b;
+    position: fixed;
+    top: 0;
+    left: 0; /* Fica sempre visível */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); /* Sombras para dar destaque */
+}
+
+#side-bar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%; /* Preenche a largura do side-bar */
+}
+
+#side-bar ul li {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#side-bar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
+    width: 100%; /* Preenche toda a largura */
+    text-align: left; /* Alinha o texto à esquerda */
+    border-radius: 5px; /* Bordas arredondadas para um visual mais suave */
+}
+
+#side-bar ul li a:hover {
+    background-color: #64ccc5;
+}
+
+.logout-item {
+    margin-top: auto; /* Coloca o botão de logout no final da barra lateral */
+    width: 100%;
+}
+
+.logout-icon {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.2em;
+    padding: 10px 15px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+    border-radius: 5px; /* Borda arredondada no botão de logout */
+}
+
+.logout-icon:hover {
+    background-color: #64ccc5;
+}

@@ -1,0 +1,8 @@
+
+<h2>Confirmar Exclusão</h2>
+<p>Tem certeza que deseja excluir a quadra "{{ quadra.local }}"?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a href="{% url 'listar_quadras' %}" class="btn btn-secondary">Cancelar</a>
+</form>

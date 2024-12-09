@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARCA AÍ!</title>
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="shortcut icon" href="{% static 'assets/img/Marca Aí! Short.svg' %}" />
+  <link rel="shortcut icon" href="{% static 'assets/images/T.png' %}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKCb3V1EvFceZILU-A8T4h9RQy0zBzYU&callback=initMap"></script>
+  <script>
+    let map;
+    let markers = [];
+    let pontos = JSON.parse(localStorage.getItem('pontosMarcados')) || [];
+
+    function initMap() {
+      const localizacaoInicial = { lat: -15.7801, lng: -47.9292 }; // Brasília
+
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: localizacaoInicial,
+        zoom: 14,
+        disableDefaultUI: true,
+      });
+
+      carregarPontos(map);
+
+      map.addListener('click', (e) => {
+        addMarker(e.latLng, map);
+      });
+    }
+
+    function addMarker(location, map) {
+      const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        title: 'Clique para salvar informações do ponto',
+      });
+
+      marker.addListener('click', () => {
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div>
+              <h3>Salvar Informações do Ponto</h3>
+              <p><strong>Localização:</strong> ${location.lat()}, ${location.lng()}</p>
+              <label for="local">Local:</label>
+              <input type="text" id="local" placeholder="Ex.: Guará">
+              <label for="descricao">Descrição:</label>
+              <input type="text" id="descricao" placeholder="Ex.: Quadra poliesportiva">
+              <button onclick="salvarPonto(${location.lat()}, ${location.lng()})">Salvar</button>
+            </div>
+          `,
+        });
+
+        infoWindow.open(map, marker);
+      });
+
+      markers.push(marker);
+    }
+
+    function salvarPonto(lat, lng) {
+      const local = document.getElementById('local').value;
+      const descricao = document.getElementById('descricao').value;
+
+      if (!local || !descricao) {
+        alert('Por favor, preencha todos os campos antes de salvar.');
+        return;
+      }
+
+      const ponto = {
+        lat: lat,
+        lng: lng,
+        local: local,
+        descricao: descricao,
+      };
+
+      // Salvar no LocalStorage
+      pontos.push(ponto);
+      localStorage.setItem('pontosMarcados', JSON.stringify(pontos));
+
+      // Salvar no banco via API
+      fetch('/api/salvar_quadra/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ponto),
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Erro ao salvar a quadra no servidor.');
+          }
+        })
+        .then(data => {
+          alert('Quadra salva com sucesso no banco de dados!');
+          console.log('Resposta do servidor:', data);
+        })
+        .catch(error => {
+          console.error('Erro ao salvar quadra:', error);
+          alert('Erro ao salvar a quadra no banco de dados.');
+        });
+    }
+
+    function carregarPontos(map) {
+      pontos.forEach(ponto => {
+        const marker = new google.maps.Marker({
+          position: { lat: ponto.lat, lng: ponto.lng },
+          map: map,
+          title: `${ponto.descricao} (${ponto.esporte})`,
+          icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        });
+
+        marker.addListener('mouseover', () => {
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div>
+                <h3>${ponto.descricao}</h3>
+                <p>Esporte: ${ponto.esporte}</p>
+              </div>
+            `,
+          });
+
+          infoWindow.open(map, marker);
+        });
+
+        markers.push(marker);
+      });
+    }
+  </script>
+  <style>
+#side-bar {
+    width: 200px; /* Define uma largura fixa para a barra lateral */
+    height: 100%;
+    background: linear-gradient(to bottom, #FF4500, #FFA500); /* Gradiente de laranja escuro para laranja claro */
+    position: fixed;
+    top: 0;
+    left: 0; /* Fica sempre visível */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); /* Sombras para dar destaque */
+}
+
+#side-bar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%; /* Preenche a largura do side-bar */
+}
+
+#side-bar ul li {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#side-bar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
+    width: 100%; /* Preenche toda a largura */
+    text-align: left; /* Alinha o texto à esquerda */
+    border-radius: 5px; /* Bordas arredondadas para um visual mais suave */
+}
+
+#side-bar ul li a:hover {
+    background-color: #FFA500; /* Tom laranja mais claro no hover */
+}
+
+.logout-item {
+    margin-top: auto; /* Coloca o botão de logout no final da barra lateral */
+    width: 100%;
+}
+
+.logout-icon {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.2em;
+    padding: 10px 15px;
+    text-align: left;
+    cursor: pointer;
+    width: 115%;
+    transition: background-color 0.3s;
+    border-radius: 5px; /* Borda arredondada no botão de logout */
+}
+
+.logout-icon:hover {
+    background-color: #FFA500; /* Mesmo tom de hover para o logout */
+}
+</style>
+</head>
+<nav id="side-bar">
+    <ul>
+        <li><a href="{% url 'home' %}">Home/Mapa</a></li>
+        <li><a href="{% url 'listar_quadras' %}">Quadras</a></li>
+        <li><a href="{% url 'perfil' %}">Perfil</a></li>
+        <li class="logout-item">
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-icon">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
+        </li>
+    </ul>
+</nav>
+<body>
+  <div class="container">
+    <div class="football-info">
+      <img class="logo" src="{% static 'assets/img/Marca Aí! Logo.svg' %}" alt="Marca Aí! Logo">
+      <div id="map" style="height: 800px; width: 100%;"></div>
+      <a href="{% url 'listar_quadras' %}" class="voltar-btn">Ver Quadras</a>
+    </div>
+  </div>
+</body>
+</html>
