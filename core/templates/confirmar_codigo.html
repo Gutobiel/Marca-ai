@@ -35,10 +35,12 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="token" class="form-label">Digite o código recebido no e-mail:</label>
-                <input type="text" name="token" id="token" class="form-control" required>
+                <input type="text" name="token" id="token" class="form-control" >
             </div>
-            <button type="submit" class="btn btn-primary w-100">Confirmar código</button>
+            <button type="submit" class="btn btn-primary w-100 mb-2">Confirmar código</button>
+            <button type="submit" name="reenviar" value="true" class="btn btn-secondary w-100">Reenviar código</button>
         </form>
+
         {% if messages %}
         <div class="alert alert-warning mt-3">
             <ul class="mb-0">

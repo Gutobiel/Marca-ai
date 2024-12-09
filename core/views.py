@@ -159,21 +159,23 @@ def enviar_codigo(request):
         try:
             usuario = User.objects.get(email=email)
             codigo = random.randint(100000, 999999)  # Gera um código de 6 dígitos
-            usuario.profile.codigo_recuperacao = codigo  # Supondo que o modelo Profile tenha esse campo
+            usuario.profile.codigo_recuperacao = codigo
             usuario.profile.save()
 
             send_mail(
                 'Código de Redefinição de Senha',
                 f'Seu código para redefinir a senha é: {codigo}',
-                'seu_email@exemplo.com',  # Substitua pelo seu e-mail de envio
+                'seu_email@exemplo.com',
                 [email],
                 fail_silently=False,
             )
             messages.success(request, 'Código enviado para o seu e-mail.')
+            request.session['email'] = email  # Armazena o e-mail na sessão
             return redirect('confirmar_codigo')
         except User.DoesNotExist:
             messages.error(request, 'E-mail não encontrado.')
     return render(request, 'enviar_codigo.html')
+
 
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -181,19 +183,39 @@ from django.shortcuts import redirect, render
 
 def confirmar_codigo(request):
     if request.method == 'POST':
-        token = request.POST.get('token')
-        try:
-            # Buscar o Profile pelo código de recuperação
-            profile = Profile.objects.get(codigo_recuperacao=token)
-            profile.codigo_recuperacao = None  # Apaga o código após uso
-            profile.save()
+        if 'reenviar' in request.POST:  # Botão "Reenviar Código" foi clicado
+            email = request.session.get('email')
+            if email:
+                try:
+                    usuario = User.objects.get(email=email)
+                    codigo = random.randint(100000, 999999)
+                    usuario.profile.codigo_recuperacao = codigo
+                    usuario.profile.save()
 
-            # Autentica o usuário temporariamente para redefinir a senha
-            request.session['user_id'] = profile.user.id  # Armazena o ID do usuário na sessão
-            return redirect('redefinir_senha')
-        except Profile.DoesNotExist:
-            messages.error(request, 'Código inválido ou expirado.')
+                    send_mail(
+                        'Código de Redefinição de Senha',
+                        f'Seu código para redefinir a senha é: {codigo}',
+                        'seu_email@exemplo.com',
+                        [email],
+                        fail_silently=False,
+                    )
+                    messages.success(request, 'Código reenviado para o seu e-mail.')
+                except User.DoesNotExist:
+                    messages.error(request, 'Erro ao reenviar o código.')
+            else:
+                messages.error(request, 'E-mail não encontrado na sessão.')
+        else:
+            token = request.POST.get('token')
+            try:
+                profile = Profile.objects.get(codigo_recuperacao=token)
+                profile.codigo_recuperacao = None
+                profile.save()
+                request.session['user_id'] = profile.user.id
+                return redirect('redefinir_senha')
+            except Profile.DoesNotExist:
+                messages.error(request, 'Código inválido ou expirado.')
     return render(request, 'confirmar_codigo.html')
+
 
 def redefinir_senha(request):
     if request.method == 'POST':
