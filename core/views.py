@@ -175,31 +175,45 @@ def enviar_codigo(request):
             messages.error(request, 'E-mail não encontrado.')
     return render(request, 'enviar_codigo.html')
 
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
 def confirmar_codigo(request):
     if request.method == 'POST':
         token = request.POST.get('token')
         try:
-            profile = request.user.profile  # Ajuste conforme sua relação com User
-            if str(profile.codigo_recuperacao) == token:
-                profile.codigo_recuperacao = None  # Apaga o código após uso
-                profile.save()
-                return redirect('redefinir_senha')
-            else:
-                messages.error(request, 'Código inválido.')
-        except AttributeError:
-            messages.error(request, 'Erro interno, tente novamente.')
+            # Buscar o Profile pelo código de recuperação
+            profile = Profile.objects.get(codigo_recuperacao=token)
+            profile.codigo_recuperacao = None  # Apaga o código após uso
+            profile.save()
+
+            # Autentica o usuário temporariamente para redefinir a senha
+            request.session['user_id'] = profile.user.id  # Armazena o ID do usuário na sessão
+            return redirect('redefinir_senha')
+        except Profile.DoesNotExist:
+            messages.error(request, 'Código inválido ou expirado.')
     return render(request, 'confirmar_codigo.html')
 
 def redefinir_senha(request):
     if request.method == 'POST':
         nova_senha = request.POST.get('password')
-        user = request.user
-        user.password = make_password(nova_senha)
-        user.save()
-        messages.success(request, 'Senha redefinida com sucesso.')
-        return redirect('login')
-    return render(request, 'redefinir_senha.html')
+        user_id = request.session.get('user_id')  # Recupera o ID do usuário da sessão
 
+        if user_id:
+            try:
+                user = User.objects.get(id=user_id)
+                user.password = make_password(nova_senha)
+                user.save()
+                messages.success(request, 'Senha redefinida com sucesso.')
+                del request.session['user_id']  # Remove o ID da sessão após a redefinição
+                return redirect('login')
+            except User.DoesNotExist:
+                messages.error(request, 'Usuário não encontrado.')
+        else:
+            messages.error(request, 'Sessão inválida. Tente novamente.')
+
+    return render(request, 'redefinir_senha.html')
 
 
 @login_required
