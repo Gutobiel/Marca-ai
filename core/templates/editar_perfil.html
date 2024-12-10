@@ -79,6 +79,88 @@
   display: block;
   margin: 0 auto 20px;
 }
+
+/* Estilos do formulário de edição de perfil */
+.block1 {
+  margin-left: 220px; /* Para compensar a largura da barra lateral */
+  padding: 20px;
+}
+
+.container {
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #FF4500;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"] {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+  border-color: #FF4500;
+  outline: none;
+}
+
+#save-button {
+  background-color: #FF4500;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+#save-button:hover {
+  background-color: #FFA500;
+}
+
+.btn-cancel {
+  display: inline-block;
+  padding: 10px 20px;
+  text-decoration: none;
+  background-color: #ddd;
+  border-radius: 5px;
+  color: #333;
+  text-align: center;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel:hover {
+  background-color: #c5c5c5;
+}
 </style>
 <body>
 <nav id="side-bar">
@@ -96,34 +178,31 @@
         </li>
     </ul>
 </nav>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
   <div class="block1">
     <div class="container">
       <h2 class="profile-title">Editar Perfil</h2>
 
-      <!-- Exibindo mensagens de erro ou sucesso -->
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      <form action="{% url 'editar_perfil' %}" method="post" enctype="multipart/form-data" id="form">
+      <form method="POST">
         {% csrf_token %}
+        <label for="username">Nome de Usuário:</label>
+        <input type="text" id="username" name="username" value="{{ user.username }}" required>
         
-        <div class="form-group">
-          <label for="username">Nome de Usuário</label>
-          <input class="input" type="text" name="username" value="{{ user.username }}" >
-        </div>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        
+        <button type="submit" id="save-button">Salvar Alterações</button>
+    </form>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input class="input" type="email" name="email" value="{{ user.email }}" required>
-        </div>
-
-        <button type="submit" class="btn-save">Salvar Alterações</button> 
-      </form>
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
 
       <div class="cancel-action">
         <a href="{% url 'perfil' %}" class="btn-cancel">Cancelar</a>
@@ -132,6 +211,7 @@
   </div>
 
   <div class="block2"></div>
+  
 </body>
 
 </html>

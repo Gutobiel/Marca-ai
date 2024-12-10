@@ -41,9 +41,13 @@
                 <td>{{ partida.horario }}</td>
                 <td>{{ partida.max_participantes }}</td>
                 <td>
-                  <!-- Botões de ação -->
-                  <a href="{% url 'editar_partida' partida.id %}" class="btn btn-warning btn-sm">Editar</a>
-                  <a href="{% url 'excluir_partida' partida.id %}" class="btn btn-danger btn-sm" {% comment %} onclick="return confirm('Tem certeza que deseja excluir esta partida?')" {% endcomment %}>Excluir</a>
+                  {% if partida.criador == request.user %}
+                    <!-- Botões de ação apenas se o usuário for o criador da partida -->
+                    <a href="{% url 'editar_partida' partida.id %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'excluir_partida' partida.id %}" class="btn btn-danger btn-sm" {% comment %} onclick="return confirm('Tem certeza que deseja excluir esta partida?')" {% endcomment %}>Excluir</a>
+                    
+                  {% endif %}
+                  <a class="btn btn-warning btn-sm">Inscrever-se</a>
                 </td>
               </tr>
             {% endfor %}

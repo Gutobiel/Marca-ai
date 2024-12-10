@@ -86,13 +86,41 @@ def user_login(request):
             # Garante que o perfil do usuário exista
             if not hasattr(user, 'profile'):
                 Profile.objects.create(user=user)
-
+                
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Login com backend explícito
             return redirect('home')
         else:
             messages.error(request, 'Email ou senha incorretos.')
     
     return render(request, 'login.html')
+
+@login_required
+def editar_perfil(request):
+    user = request.user  # Usuário autenticado atual
+    
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+
+        # Valida se o email já está em uso por outro usuário
+        if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+            messages.error(request, 'Este e-mail já está em uso por outro usuário.')
+            return redirect('editar_perfil')
+
+        # Valida se o username já está em uso por outro usuário
+        if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+            messages.error(request, 'Este nome de usuário já está em uso.')
+            return redirect('editar_perfil')
+
+        # Atualiza o perfil do usuário
+        user.username = username
+        user.email = email
+        user.save()
+
+        messages.success(request, 'Perfil atualizado com sucesso!')
+        return redirect('perfil')  # Redireciona para a página do perfil
+
+    return render(request, 'editar_perfil.html', {'user': user})
 
 @csrf_exempt
 def salvar_ponto(request):

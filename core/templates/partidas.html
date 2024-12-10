@@ -30,7 +30,12 @@
           <tr class="quadra-item" data-id="{{ quadra.id }}">
             <td>{{ quadra.local }}</td>
             <td>{{ quadra.descricao }}</td>
-            <td>{{ quadra.latitude }}, {{ quadra.longitude }}</td>
+            <td>
+              <!-- Botão para abrir o Google Maps -->
+              <a href="https://www.google.com/maps?q={{ quadra.latitude }},{{ quadra.longitude }}" 
+                 class="btn btn-success btn-sm" target="_blank" title="Ver no Mapa">
+                 Ver no Mapa
+              </a></td>
             <td class="text-center">
               <a href="{% url 'criar_partida' quadra.id %}" class="btn btn-primary btn-sm" title="Criar Partida">Criar Partida</a>
               <a href="{% url 'ver_partidas_criadas' quadra.id %}" class="btn btn-info btn-sm" title="Ver Partidas">Ver Partidas</a>

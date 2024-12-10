@@ -20,12 +20,14 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView
 
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', views.user_login, name='login'),       
+    path('', views.user_login, name='login'),   
+    path('login/', views.user_login, name='login'),    
     path('cadastro/', views.register, name='cadastro'),
     path('home/', views.home, name='home'), 
     path('partidas/', views.partidas, name='partidas'), 
@@ -42,7 +44,6 @@ urlpatterns = [
     path('criar_partida/<int:quadra_id>/', views.criar_partida, name='criar_partida'),
     path('partidas/<int:quadra_id>/', views.listar_partidas, name='listar_partidas'),
     path('quadra/<int:quadra_id>/partidas/', views.ver_partidas_criadas, name='ver_partidas_criadas'),
-    path('perfil/', views.perfil, name='perfil'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('quadra/editar/<int:quadra_id>/', views.editar_quadra, name='editar_quadra'),
     path('quadra/excluir/<int:quadra_id>/', views.excluir_quadra, name='excluir_quadra'),
@@ -50,4 +51,5 @@ urlpatterns = [
     path('partida/excluir/<int:partida_id>/', views.excluir_partida, name='excluir_partida'),
     path('perfil/', views.perfil, name='perfil'),
     path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
+    
 ]
